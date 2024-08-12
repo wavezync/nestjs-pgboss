@@ -11,10 +11,10 @@
     "format": "prettier --write \"{src,apps,libs,test}/**/*.ts\"",
     "test": "jest"
   },
-  "dependencies": {
-    "@nestjs/common": "^9.0.0",
-    "@nestjs/core": "^9.0.0",
-    "pg-boss": "^9.0.3"
+  "peerDependencies": {
+    "@nestjs/common": "^9 || ^10",
+    "@nestjs/core": "^9 || ^10",
+    "pg-boss": "^9"
   },
   "devDependencies": {
     "@nestjs/testing": "^9.0.0",
@@ -30,6 +30,7 @@
     "typescript": "^5.0.0"
   },
   "license": "MIT",
+  "author": "samaratungajs@wavezync.com",
   "jest": {
     "roots": [
       "<rootDir>/tests"
