@@ -1,0 +1,50 @@
+{
+  "name": "@wavezync/nestjs-pgboss",
+  "version": "1.0.0",
+  "description": "A NestJS module that integrates pg-boss for job scheduling and handling.",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build",
+    "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
+    "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
+    "format": "prettier --write \"{src,apps,libs,test}/**/*.ts\"",
+    "test": "jest"
+  },
+  "dependencies": {
+    "@nestjs/common": "^9.0.0",
+    "@nestjs/core": "^9.0.0",
+    "pg-boss": "^9.0.3"
+  },
+  "devDependencies": {
+    "@nestjs/testing": "^9.0.0",
+    "@types/jest": "^29.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.1",
+    "@typescript-eslint/parser": "^8.0.1",
+    "eslint": "8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "jest": "^29.0.0",
+    "prettier": "^3.3.3",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.0.0"
+  },
+  "license": "MIT",
+  "jest": {
+    "roots": [
+      "<rootDir>/tests"
+    ],
+    "transform": {
+      "^.+\\.(t|j)s$": "ts-jest"
+    },
+    "testEnvironment": "node",
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wavezync/nestjs-pgboss"
+  }
+}
