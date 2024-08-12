@@ -3,8 +3,10 @@
   "version": "1.0.0",
   "description": "A NestJS module that integrates pg-boss for job scheduling and handling.",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "scripts": {
-    "build": "tsc",
+    "build": "nest build",
     "prepublishOnly": "npm run build",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\"",
     "lint:fix": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",

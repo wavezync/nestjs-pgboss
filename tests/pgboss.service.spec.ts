@@ -1,7 +1,7 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import PgBoss from "pg-boss";
-import { PgBossService } from "../src/pgboss.service";
-import { PGBOSS_TOKEN } from "../src/utils/consts";
+import { PgBossService } from "../lib/pgboss.service";
+import { PGBOSS_TOKEN } from "../lib/utils/consts";
 
 describe("PgBossService", () => {
   let service: PgBossService;
