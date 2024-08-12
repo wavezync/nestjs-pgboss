@@ -76,6 +76,22 @@ export class MyJobHandler {
 }
 
 ```
+Handle cron jobs using the `@CronJob` decorator:
+```ts
+import { Injectable, Logger } from '@nestjs/common';
+import { PgBossService, Cron } from '@wavezync/nestjs-pgboss';
+
+@Injectable()
+export class MyCronJobService {
+  private readonly logger = new Logger(MyCronJobService.name);
+
+  @CronJob('my-cron-job', '0 * * * *', { priority: 1 })
+  async handleCron() {
+    this.logger.log('Executing cron job: my-cron-job');
+  }
+}
+
+```
 
 ## Test
 

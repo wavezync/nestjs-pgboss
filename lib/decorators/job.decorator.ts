@@ -16,7 +16,7 @@ export function Job<_TData extends object = any>(
   };
 }
 
-export function Cron<_TData extends object = any>(
+export function CronJob<_TData extends object = any>(
   name: string,
   cron: string,
   options: JobOptions = {},
