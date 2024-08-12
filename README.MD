@@ -8,7 +8,7 @@
    <a href="https://github.com/wavezync/nestjs-pgboss/actions/workflows/build.yaml">
         <img src="https://img.shields.io/github/actions/workflow/status/wavezync/nestjs-pgboss/build.yaml?branch=main" alt="Build Status">
     </a>
-    <a href="https://opensource.org/licenses/MIT">
+    <a href="https://github.com/wavezync/nestjs-pgboss/blob/main/LICENSE">
         <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
     </a>
 </p>
