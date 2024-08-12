@@ -4,6 +4,11 @@
     Use <a href="https://github.com/timgit/pg-boss" target="_blank">pg-boss</a> in your Nest.js service!
 <p align="center">
 
+<p align="center">
+    <a href="https://github.com/wavezync/nestjs-pgboss/actions/workflows/build.yaml">
+        <img src="https://github.com/wavezync/nestjs-pgboss/actions/workflows/build.yaml/badge.svg" alt="Build Status">
+    </a>
+</p>
 ## Installation
 
 ```bash
