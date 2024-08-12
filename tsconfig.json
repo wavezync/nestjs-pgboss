@@ -12,7 +12,7 @@
     "sourceMap": true,
     "outDir": "./dist",
     "baseUrl": "lib",
-    "incremental": true,
+    "incremental": false,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -27,7 +27,7 @@
   },
   "include": [
     "lib/**/*.ts",
-    "tests/**/*.ts"
+    "test/**/*.ts"
   ],
   "exclude": [
     "node_modules",
