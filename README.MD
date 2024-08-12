@@ -34,6 +34,40 @@ import { PGBossModule } from "@wavezync/nestjs-pgboss";
 export class AppModule {}
 ```
 
+Schedule a job using `PgBossService`:
+
+```ts
+import { Injectable } from '@nestjs/common';
+import { PgBossService } from '@wavezync/nestjs-pgboss';
+
+@Injectable()
+export class JobSchedulerService {
+  constructor(private readonly pgBossService: PgBossService) {}
+
+  async scheduleJob() {
+    await this.pgBossService.scheduleJob('my-job', { key: 'value' });
+  }
+}
+
+```
+Handle jobs using the `@Job` decorator:
+
+```ts
+import { Injectable, Logger } from '@nestjs/common';
+import { Job } from '@wavezync/nestjs-pgboss';
+
+@Injectable()
+export class MyJobHandler {
+  private readonly logger = new Logger(MyJobHandler.name);
+
+  @Job('my-job')
+  async handleMyJob(job: { data: any }) {
+    this.logger.log('Handling job with data:', job.data);
+  }
+}
+
+```
+
 ## Test
 
 ```bash
