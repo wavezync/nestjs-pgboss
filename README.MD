@@ -85,7 +85,7 @@ export class MyJobHandler {
 
 ```ts
 import { Injectable, Logger } from '@nestjs/common';
-import { PgBossService, Cron } from '@wavezync/nestjs-pgboss';
+import { PgBossService, CronJob } from '@wavezync/nestjs-pgboss';
 
 @Injectable()
 export class MyCronJobService {
