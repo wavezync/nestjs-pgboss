@@ -73,6 +73,10 @@ import { Job } from '@wavezync/nestjs-pgboss';
 export class MyJobHandler {
   private readonly logger = new Logger(MyJobHandler.name);
 
+  constructor(private readonly pgBossService: PgBossService) {
+    this.pgBossService.registerJobHandler(this);
+  }
+
   @Job('my-job')
   async handleMyJob(job: { data: any }) {
     this.logger.log('Handling job with data:', job.data);
@@ -90,6 +94,10 @@ import { PgBossService, CronJob } from '@wavezync/nestjs-pgboss';
 @Injectable()
 export class MyCronJobService {
   private readonly logger = new Logger(MyCronJobService.name);
+
+  constructor(private readonly pgBossService: PgBossService) {
+    this.pgBossService.registerJobHandler(this);
+  }
 
   @CronJob('my-cron-job', '0 * * * *', { priority: 1 })
   async handleCron() {

@@ -1,4 +1,3 @@
-// src/pg-boss.module.ts
 import {
   Module,
   DynamicModule,
@@ -13,6 +12,7 @@ import {
   PgBossModuleAsyncOptions,
   PgBossOptionsFactory,
 } from "./interfaces/pgboss-module-options.interface";
+import { Reflector } from "@nestjs/core";
 
 @Global()
 @Module({})
@@ -36,7 +36,7 @@ export class PgBossModule {
     return {
       module: PgBossModule,
       imports: options.imports || [],
-      providers: [...asyncProviders, pgBossProvider, PgBossService],
+      providers: [...asyncProviders, pgBossProvider, PgBossService, Reflector],
       exports: [PgBossService],
     };
   }
@@ -54,10 +54,7 @@ export class PgBossModule {
 
     return [
       this.createAsyncOptionsProvider(options),
-      {
-        provide: useClass,
-        useClass,
-      },
+      { provide: useClass, useClass },
     ];
   }
 
