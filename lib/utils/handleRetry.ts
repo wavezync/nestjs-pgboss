@@ -1,11 +1,11 @@
-import { defer, of, throwError } from "rxjs";
+import { of, throwError } from "rxjs";
 import { mergeMap, retryWhen, take, delay } from "rxjs/operators";
 
 export function handleRetry(
   retryAttempts = 9,
   retryDelay = 3000,
   verbose = false,
-  toRetry: (err: any) => boolean = (err: any) => true,
+  toRetry: (err: any) => boolean = (_err: any) => true,
 ) {
   return <T>(source: import("rxjs").Observable<T>) =>
     source.pipe(
