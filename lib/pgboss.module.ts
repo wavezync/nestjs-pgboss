@@ -1,30 +1,58 @@
 import {
-  Module,
   DynamicModule,
   Global,
-  Provider,
   Logger,
+  Module,
+  OnModuleInit,
+  OnApplicationBootstrap,
+  OnModuleDestroy,
+  Inject,
 } from "@nestjs/common";
+import { MetadataScanner } from "@nestjs/core";
 import PgBoss from "pg-boss";
+import { defer, lastValueFrom } from "rxjs";
 import { PgBossService } from "./pgboss.service";
-import { PGBOSS_OPTIONS, PGBOSS_TOKEN } from "./utils/consts";
+import { LOGGER, PGBOSS_OPTIONS, PGBOSS_TOKEN } from "./utils/consts";
 import {
   PgBossModuleAsyncOptions,
   PgBossOptionsFactory,
 } from "./interfaces/pgboss-module-options.interface";
-import { Reflector } from "@nestjs/core";
+import { HandlerScannerService } from "./handler-scanner.service";
+import { handleRetry } from "utils/handleRetry";
 
 @Global()
-@Module({})
-export class PgBossModule {
-  static forRootAsync(options: PgBossModuleAsyncOptions): DynamicModule {
-    const logger = new Logger(PgBossModule.name);
+@Module({
+  providers: [MetadataScanner, HandlerScannerService],
+})
+export class PgBossModule
+  implements OnModuleInit, OnApplicationBootstrap, OnModuleDestroy
+{
+  private readonly logger = new Logger(LOGGER);
 
-    const pgBossProvider: Provider = {
+  constructor(
+    @Inject(PGBOSS_TOKEN) private readonly boss: PgBoss,
+    private readonly handlerScannerService: HandlerScannerService,
+  ) {}
+
+  static forRootAsync(options: PgBossModuleAsyncOptions): DynamicModule {
+    const logger = new Logger(LOGGER);
+
+    const pgBossProvider = {
       provide: PGBOSS_TOKEN,
       useFactory: async (pgBossOptions) => {
-        const boss = new PgBoss(pgBossOptions.connectionString);
-        await boss.start();
+        const boss = await lastValueFrom(
+          defer(() =>
+            new PgBoss({
+              connectionString: pgBossOptions.connectionString,
+            }).start(),
+          ).pipe(
+            handleRetry(
+              pgBossOptions.retryAttempts,
+              pgBossOptions.retryDelay,
+              pgBossOptions.verboseRetryLog,
+            ),
+          ),
+        );
         logger.log("PgBoss started successfully");
         return boss;
       },
@@ -36,14 +64,18 @@ export class PgBossModule {
     return {
       module: PgBossModule,
       imports: options.imports || [],
-      providers: [...asyncProviders, pgBossProvider, PgBossService, Reflector],
-      exports: [PgBossService],
+      providers: [
+        ...asyncProviders,
+        pgBossProvider,
+        PgBossService,
+        HandlerScannerService,
+        MetadataScanner,
+      ],
+      exports: [PgBossService, PGBOSS_TOKEN],
     };
   }
 
-  private static createAsyncProviders(
-    options: PgBossModuleAsyncOptions,
-  ): Provider[] {
+  private static createAsyncProviders(options: PgBossModuleAsyncOptions) {
     if (options.useExisting || options.useFactory) {
       return [this.createAsyncOptionsProvider(options)];
     }
@@ -58,9 +90,7 @@ export class PgBossModule {
     ];
   }
 
-  private static createAsyncOptionsProvider(
-    options: PgBossModuleAsyncOptions,
-  ): Provider {
+  private static createAsyncOptionsProvider(options: PgBossModuleAsyncOptions) {
     if (options.useFactory) {
       return {
         provide: PGBOSS_OPTIONS,
@@ -77,5 +107,25 @@ export class PgBossModule {
         optionsFactory.createPgBossOptions(),
       inject,
     };
+  }
+
+  onModuleInit() {}
+
+  async onApplicationBootstrap(): Promise<void> {
+    await this.setupWorkers();
+  }
+
+  async onModuleDestroy(): Promise<void> {
+    try {
+      if (this.boss) {
+        await this.boss.stop();
+      }
+    } catch (e) {
+      this.logger.error(e);
+    }
+  }
+
+  private async setupWorkers() {
+    await this.handlerScannerService.scanAndRegisterHandlers();
   }
 }
