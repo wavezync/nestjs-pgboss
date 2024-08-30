@@ -1,5 +1,5 @@
 import { Injectable } from "@nestjs/common";
-import PgBoss, { BatchWorkOptions, WorkHandler } from "pg-boss";
+import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { Inject } from "@nestjs/common";
 import { PGBOSS_TOKEN } from "./utils/consts";
 
@@ -27,19 +27,27 @@ export class PgBossService {
   async registerCronJob<TData extends object>(
     name: string,
     cron: string,
-    handler: WorkHandler<TData>,
+    handler: WorkWithMetadataHandler<TData>,
     data?: TData,
     options?: PgBoss.ScheduleOptions,
   ) {
     await this.boss.schedule(name, cron, data ?? {}, options ?? {});
-    await this.boss.work(name, handler);
+    await this.boss.work<TData>(
+      name,
+      { ...options, includeMetadata: true },
+      handler,
+    );
   }
 
   async registerJob<TData extends object>(
     name: string,
-    handler: WorkHandler<TData>,
-    options?: BatchWorkOptions,
+    handler: WorkWithMetadataHandler<TData>,
+    options?: PgBoss.BatchWorkOptions,
   ) {
-    await this.boss.work(name, options, handler);
+    await this.boss.work<TData>(
+      name,
+      { ...options, includeMetadata: true },
+      handler,
+    );
   }
 }

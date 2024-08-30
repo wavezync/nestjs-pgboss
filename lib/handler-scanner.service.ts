@@ -1,3 +1,4 @@
+import { Injectable, Logger } from "@nestjs/common";
 import { Reflector, ModulesContainer } from "@nestjs/core";
 import { PgBossService } from "./pgboss.service";
 import {
@@ -7,9 +8,8 @@ import {
   CRON_OPTIONS,
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
-import { BatchWorkOptions } from "pg-boss";
+import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { LOGGER } from "./utils/consts";
-import { Injectable, Logger } from "@nestjs/common";
 
 @Injectable()
 export class HandlerScannerService {
@@ -26,7 +26,7 @@ export class HandlerScannerService {
       const providers = [...module.providers.values()];
 
       for (const provider of providers) {
-        this.scanProvider(provider);
+        await this.scanProvider(provider);
       }
     }
   }
@@ -44,7 +44,7 @@ export class HandlerScannerService {
     for (const methodName of methodNames) {
       const methodRef = instance[methodName];
       const jobName = this.reflector.get<string>(JOB_NAME, methodRef);
-      const jobOptions = this.reflector.get<BatchWorkOptions>(
+      const jobOptions = this.reflector.get<PgBoss.WorkOptions>(
         JOB_OPTIONS,
         methodRef,
       );
@@ -55,8 +55,12 @@ export class HandlerScannerService {
       const cronOptions = this.reflector.get<any>(CRON_OPTIONS, methodRef);
 
       if (jobName) {
-        const boundHandler = methodRef.bind(instance);
-
+        const boundHandler: WorkWithMetadataHandler<any> = async (job) => {
+          const jobData = {
+            ...job,
+          };
+          await methodRef.call(instance, jobData);
+        };
         try {
           if (cronExpression) {
             await this.pgBossService.registerCronJob(
@@ -71,12 +75,12 @@ export class HandlerScannerService {
             await this.pgBossService.registerJob(
               jobName,
               boundHandler,
-              jobOptions,
+              jobOptions as PgBoss.BatchWorkOptions,
             );
             this.logger.log(`Registered job: ${jobName}`);
           }
         } catch (error) {
-          this.logger.error(`Error registering job ${jobName}:`);
+          this.logger.error(`Error registering job ${jobName}:`, error);
         }
       }
     }
