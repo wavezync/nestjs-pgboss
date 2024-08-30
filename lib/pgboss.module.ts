@@ -32,7 +32,11 @@ export class PgBossModule
   constructor(
     @Inject(PGBOSS_TOKEN) private readonly boss: PgBoss,
     private readonly handlerScannerService: HandlerScannerService,
-  ) {}
+  ) {
+    this.boss.on("error", (error: Error) => {
+      this.logger.error(`PgBoss error: ${error.message}`, error.stack);
+    });
+  }
 
   static forRootAsync(options: PgBossModuleAsyncOptions): DynamicModule {
     const logger = new Logger(LOGGER);
@@ -53,6 +57,9 @@ export class PgBossModule
             ),
           ),
         );
+        boss.on("error", (error: Error) => {
+          logger.error(`PgBoss error: ${error.message}`, error.stack);
+        });
         logger.log("PgBoss started successfully");
         return boss;
       },
