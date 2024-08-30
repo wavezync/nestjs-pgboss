@@ -1,4 +1,3 @@
-import { Injectable, Logger } from "@nestjs/common";
 import { Reflector, ModulesContainer } from "@nestjs/core";
 import { PgBossService } from "./pgboss.service";
 import {
@@ -9,7 +8,8 @@ import {
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import { BatchWorkOptions } from "pg-boss";
-import { LOGGER } from "utils/consts";
+import { LOGGER } from "./utils/consts";
+import { Injectable, Logger } from "@nestjs/common";
 
 @Injectable()
 export class HandlerScannerService {
@@ -57,22 +57,26 @@ export class HandlerScannerService {
       if (jobName) {
         const boundHandler = methodRef.bind(instance);
 
-        if (cronExpression) {
-          await this.pgBossService.registerCronJob(
-            jobName,
-            cronExpression,
-            boundHandler,
-            {},
-            cronOptions,
-          );
-          this.logger.log(`Registered cron job: ${jobName}`);
-        } else {
-          await this.pgBossService.registerJob(
-            jobName,
-            boundHandler,
-            jobOptions,
-          );
-          this.logger.log(`Registered job: ${jobName}`);
+        try {
+          if (cronExpression) {
+            await this.pgBossService.registerCronJob(
+              jobName,
+              cronExpression,
+              boundHandler,
+              {},
+              cronOptions,
+            );
+            this.logger.log(`Registered cron job: ${jobName}`);
+          } else {
+            await this.pgBossService.registerJob(
+              jobName,
+              boundHandler,
+              jobOptions,
+            );
+            this.logger.log(`Registered job: ${jobName}`);
+          }
+        } catch (error) {
+          this.logger.error(`Error registering job ${jobName}:`);
         }
       }
     }
