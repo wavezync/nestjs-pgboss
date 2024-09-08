@@ -5,7 +5,10 @@ import { PGBOSS_TOKEN } from "./utils/consts";
 
 @Injectable()
 export class PgBossService {
-  constructor(@Inject(PGBOSS_TOKEN) private readonly boss: PgBoss) {}
+  public boss: PgBoss;
+  constructor(@Inject(PGBOSS_TOKEN) boss: PgBoss) {
+    this.boss = boss;
+  }
 
   async scheduleJob<TData extends object>(
     name: string,
