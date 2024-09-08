@@ -5,14 +5,22 @@ import { PGBOSS_TOKEN } from "./utils/consts";
 
 @Injectable()
 export class PgBossService {
-  constructor(@Inject(PGBOSS_TOKEN) private readonly boss: PgBoss) {}
+  private pgBoss: PgBoss;
+
+  constructor(@Inject(PGBOSS_TOKEN) boss: PgBoss) {
+    this.pgBoss = boss;
+  }
+
+  get boss(): PgBoss {
+    return this.pgBoss;
+  }
 
   async scheduleJob<TData extends object>(
     name: string,
     data: TData,
     options?: PgBoss.SendOptions,
   ) {
-    await this.boss.send(name, data, options);
+    await this.pgBoss.send(name, data, options);
   }
 
   async scheduleCronJob<TData extends object>(
@@ -21,7 +29,7 @@ export class PgBossService {
     data?: TData,
     options?: PgBoss.ScheduleOptions,
   ) {
-    await this.boss.schedule(name, cron, data ?? {}, options ?? {});
+    await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
   }
 
   async registerCronJob<TData extends object>(
@@ -31,8 +39,8 @@ export class PgBossService {
     data?: TData,
     options?: PgBoss.ScheduleOptions,
   ) {
-    await this.boss.schedule(name, cron, data ?? {}, options ?? {});
-    await this.boss.work<TData>(
+    await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
+    await this.pgBoss.work<TData>(
       name,
       { ...options, includeMetadata: true },
       handler,
@@ -44,7 +52,7 @@ export class PgBossService {
     handler: WorkWithMetadataHandler<TData>,
     options?: PgBoss.BatchWorkOptions,
   ) {
-    await this.boss.work<TData>(
+    await this.pgBoss.work<TData>(
       name,
       { ...options, includeMetadata: true },
       handler,

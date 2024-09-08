@@ -63,6 +63,10 @@ export class JobSchedulerService {
 
 ```
 
+#### Access `boss` Directly
+
+You can access the `PgBoss` instance directly via `pgBossService.boss`
+
 #### Handle jobs using the `@Job` decorator
 
 ```ts
