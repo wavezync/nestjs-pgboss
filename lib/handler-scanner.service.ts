@@ -75,7 +75,7 @@ export class HandlerScannerService {
             await this.pgBossService.registerJob(
               jobName,
               boundHandler,
-              jobOptions as PgBoss.BatchWorkOptions,
+              jobOptions,
             );
             this.logger.log(`Registered job: ${jobName}`);
           }

@@ -42,7 +42,7 @@ export class PgBossService {
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
     await this.pgBoss.work<TData>(
       name,
-      { ...options, includeMetadata: true },
+      { ...this.transformOptions(options), includeMetadata: true },
       handler,
     );
   }
@@ -50,12 +50,25 @@ export class PgBossService {
   async registerJob<TData extends object>(
     name: string,
     handler: WorkWithMetadataHandler<TData>,
-    options?: PgBoss.BatchWorkOptions,
+    options?: PgBoss.WorkOptions,
   ) {
     await this.pgBoss.work<TData>(
       name,
       { ...options, includeMetadata: true },
       handler,
     );
+  }
+  private transformOptions(
+    options?: PgBoss.WorkOptions | PgBoss.ScheduleOptions,
+  ) {
+    if (!options) return {};
+
+    const transformedOptions: any = { ...options };
+
+    if (typeof options.priority === "number") {
+      transformedOptions.priority = options.priority > 0;
+    }
+
+    return transformedOptions;
   }
 }
