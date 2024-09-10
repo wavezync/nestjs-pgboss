@@ -13,6 +13,8 @@ describe("PgBossService", () => {
       work: jest.fn(),
       send: jest.fn(),
       schedule: jest.fn(),
+      createQueue: jest.fn(),
+      getQueue: jest.fn(),
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({

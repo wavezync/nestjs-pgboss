@@ -52,14 +52,15 @@ export class HandlerScannerService {
         CRON_EXPRESSION,
         methodRef,
       );
-      const cronOptions = this.reflector.get<any>(CRON_OPTIONS, methodRef);
+      const cronOptions = this.reflector.get<PgBoss.ScheduleOptions>(
+        CRON_OPTIONS,
+        methodRef,
+      );
 
       if (jobName) {
         const boundHandler: WorkWithMetadataHandler<any> = async (job) => {
-          const jobData = {
-            ...job,
-          };
-          await methodRef.call(instance, jobData);
+          const extractedJob = this.normalizeJob(job);
+          await methodRef.call(instance, extractedJob);
         };
         try {
           if (cronExpression) {
@@ -84,5 +85,12 @@ export class HandlerScannerService {
         }
       }
     }
+  }
+
+  private normalizeJob(job: any) {
+    if (typeof job === "object" && "0" in job) {
+      return job[0];
+    }
+    return job;
   }
 }
