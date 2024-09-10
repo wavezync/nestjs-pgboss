@@ -10,6 +10,7 @@ import {
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { LOGGER } from "./utils/consts";
+import { normalizeJob } from "./utils/helpers";
 
 @Injectable()
 export class HandlerScannerService {
@@ -52,14 +53,15 @@ export class HandlerScannerService {
         CRON_EXPRESSION,
         methodRef,
       );
-      const cronOptions = this.reflector.get<any>(CRON_OPTIONS, methodRef);
+      const cronOptions = this.reflector.get<PgBoss.ScheduleOptions>(
+        CRON_OPTIONS,
+        methodRef,
+      );
 
       if (jobName) {
         const boundHandler: WorkWithMetadataHandler<any> = async (job) => {
-          const jobData = {
-            ...job,
-          };
-          await methodRef.call(instance, jobData);
+          const extractedJob = normalizeJob(job);
+          await methodRef.call(instance, extractedJob);
         };
         try {
           if (cronExpression) {
@@ -75,7 +77,7 @@ export class HandlerScannerService {
             await this.pgBossService.registerJob(
               jobName,
               boundHandler,
-              jobOptions as PgBoss.BatchWorkOptions,
+              jobOptions,
             );
             this.logger.log(`Registered job: ${jobName}`);
           }

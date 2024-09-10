@@ -13,6 +13,8 @@ describe("PgBossService", () => {
       work: jest.fn(),
       send: jest.fn(),
       schedule: jest.fn(),
+      createQueue: jest.fn(),
+      getQueue: jest.fn(),
     } as any;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -32,13 +34,13 @@ describe("PgBossService", () => {
   describe("registerJob", () => {
     it("should call PgBoss work with correct parameters", async () => {
       const handler = jest.fn();
-      const options = { batchSize: 5 };
+      const options = {};
 
       await service.registerJob("test-job", handler, options);
 
       expect(mockPgBoss.work).toHaveBeenCalledWith(
         "test-job",
-        { batchSize: 5, includeMetadata: true },
+        { includeMetadata: true },
         handler,
       );
     });
