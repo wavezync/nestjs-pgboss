@@ -21,7 +21,7 @@ export class PgBossService {
     data: TData,
     options?: PgBoss.SendOptions,
   ) {
-    await this.ensureQueueExists(name);
+    await this.pgBoss.createQueue(name);
     await this.pgBoss.send(name, data, options);
   }
 
@@ -31,7 +31,7 @@ export class PgBossService {
     data?: TData,
     options?: PgBoss.ScheduleOptions,
   ) {
-    await this.ensureQueueExists(name);
+    await this.pgBoss.createQueue(name);
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
   }
 
@@ -42,7 +42,7 @@ export class PgBossService {
     data?: TData,
     options?: PgBoss.ScheduleOptions,
   ) {
-    await this.ensureQueueExists(name);
+    await this.pgBoss.createQueue(name);
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
     await this.pgBoss.work<TData>(
       name,
@@ -56,18 +56,11 @@ export class PgBossService {
     handler: WorkWithMetadataHandler<TData>,
     options?: PgBoss.WorkOptions,
   ) {
-    await this.ensureQueueExists(name);
+    await this.pgBoss.createQueue(name);
     await this.pgBoss.work<TData>(
       name,
       { ...options, includeMetadata: true },
       handler,
     );
-  }
-
-  async ensureQueueExists(queueName: string) {
-    const currentQueue = await this.pgBoss.getQueue(queueName);
-    if (!currentQueue) {
-      await this.pgBoss.createQueue(queueName);
-    }
   }
 }
