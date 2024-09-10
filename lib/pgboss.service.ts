@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { Inject } from "@nestjs/common";
 import { PGBOSS_TOKEN } from "./utils/consts";
+import { transformOptions } from "./utils/helpers";
 
 @Injectable()
 export class PgBossService {
@@ -45,7 +46,7 @@ export class PgBossService {
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
     await this.pgBoss.work<TData>(
       name,
-      { ...this.transformOptions(options), includeMetadata: true },
+      { ...transformOptions(options), includeMetadata: true },
       handler,
     );
   }
@@ -61,19 +62,6 @@ export class PgBossService {
       { ...options, includeMetadata: true },
       handler,
     );
-  }
-  private transformOptions(
-    options?: PgBoss.WorkOptions | PgBoss.ScheduleOptions,
-  ) {
-    if (!options) return {};
-
-    const transformedOptions: any = { ...options };
-
-    if (typeof options.priority === "number") {
-      transformedOptions.priority = options.priority > 0;
-    }
-
-    return transformedOptions;
   }
 
   async ensureQueueExists(queueName: string) {

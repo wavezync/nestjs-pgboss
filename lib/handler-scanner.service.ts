@@ -10,6 +10,7 @@ import {
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { LOGGER } from "./utils/consts";
+import { normalizeJob } from "./utils/helpers";
 
 @Injectable()
 export class HandlerScannerService {
@@ -59,7 +60,7 @@ export class HandlerScannerService {
 
       if (jobName) {
         const boundHandler: WorkWithMetadataHandler<any> = async (job) => {
-          const extractedJob = this.normalizeJob(job);
+          const extractedJob = normalizeJob(job);
           await methodRef.call(instance, extractedJob);
         };
         try {
@@ -85,12 +86,5 @@ export class HandlerScannerService {
         }
       }
     }
-  }
-
-  private normalizeJob(job: any) {
-    if (typeof job === "object" && "0" in job) {
-      return job[0];
-    }
-    return job;
   }
 }

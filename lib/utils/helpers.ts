@@ -13,3 +13,10 @@ export function transformOptions(
 
   return transformedOptions;
 }
+
+export function normalizeJob(job: any) {
+  if (typeof job === "object" && "0" in job) {
+    return job[0];
+  }
+  return job;
+}
