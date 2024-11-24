@@ -6,6 +6,8 @@ import {
   JOB_OPTIONS,
   CRON_EXPRESSION,
   CRON_OPTIONS,
+  WORK_NAME,
+  WORK_OPTIONS,
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
@@ -44,6 +46,27 @@ export class HandlerScannerService {
 
     for (const methodName of methodNames) {
       const methodRef = instance[methodName];
+
+      const workName = this.reflector.get<string>(WORK_NAME, methodRef);
+      const workOptions = this.reflector.get<PgBoss.WorkOptions>(
+        WORK_OPTIONS,
+        methodRef,
+      );
+
+      if (workName) {
+        try {
+          await this.pgBossService.registerWorker(
+            workName,
+            async (jobs) => await methodRef.call(instance, jobs),
+            workOptions,
+          );
+          this.logger.log(`Registered worker: ${workName}`);
+        } catch (error) {
+          this.logger.error(error, `Error registering worker ${workName}`);
+        }
+        continue;
+      }
+
       const jobName = this.reflector.get<string>(JOB_NAME, methodRef);
       const jobOptions = this.reflector.get<PgBoss.WorkOptions>(
         JOB_OPTIONS,

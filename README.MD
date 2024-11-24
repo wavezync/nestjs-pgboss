@@ -102,6 +102,23 @@ export class MyCronJobService {
 }
 
 ```
+#### Batch Processing using the `@Work` decorator
+
+```ts
+import { Injectable, Logger } from '@nestjs/common';
+import { Work } from '@wavezync/nestjs-pgboss';
+
+@Injectable()
+export class BatchJobHandler {
+  private readonly logger = new Logger(BatchJobHandler.name);
+
+  @Work('batch-job', { batchSize: 5 })
+  async handleBatchJobs(jobs: any[]) {
+    this.logger.log(`Handle batch of ${jobs.length} jobs`);
+  }
+}
+
+```
 
 ## Test
 
