@@ -11,7 +11,7 @@ export const WORK_OPTIONS = "WORK_OPTIONS";
 
 export function Job<_TData extends object = any>(
   name: string,
-  options: JobOptions = {},
+  options: WorkOptions = {},
 ) {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     SetMetadata(JOB_NAME, name)(target, key, descriptor);
@@ -38,12 +38,5 @@ export function CronJob<_TData extends object = any>(
       key,
       descriptor,
     );
-  };
-}
-
-export function Work(name: string, options: WorkOptions = {}) {
-  return (target: any, key: string, descriptor: PropertyDescriptor) => {
-    SetMetadata(WORK_NAME, name)(target, key, descriptor);
-    SetMetadata(WORK_OPTIONS, options)(target, key, descriptor);
   };
 }

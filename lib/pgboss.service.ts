@@ -63,20 +63,4 @@ export class PgBossService {
       handler,
     );
   }
-
-  async registerWorker<TData extends object>(
-    name: string,
-    handler: (jobs: PgBoss.JobWithMetadata<TData>[]) => Promise<void>,
-    options?: PgBoss.WorkOptions,
-  ) {
-    await this.pgBoss.createQueue(name);
-    await this.pgBoss.work<TData>(
-      name,
-      { ...options, includeMetadata: true },
-      async (jobs) => {
-        const jobArray = Array.isArray(jobs) ? jobs : [jobs];
-        await handler(jobArray);
-      },
-    );
-  }
 }
