@@ -8,9 +8,8 @@ import {
   CRON_OPTIONS,
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
-import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
+import PgBoss from "pg-boss";
 import { LOGGER } from "./utils/consts";
-import { normalizeJob } from "./utils/helpers";
 
 @Injectable()
 export class HandlerScannerService {
@@ -44,6 +43,7 @@ export class HandlerScannerService {
 
     for (const methodName of methodNames) {
       const methodRef = instance[methodName];
+
       const jobName = this.reflector.get<string>(JOB_NAME, methodRef);
       const jobOptions = this.reflector.get<PgBoss.WorkOptions>(
         JOB_OPTIONS,
@@ -59,30 +59,27 @@ export class HandlerScannerService {
       );
 
       if (jobName) {
-        const boundHandler: WorkWithMetadataHandler<any> = async (job) => {
-          const extractedJob = normalizeJob(job);
-          await methodRef.call(instance, extractedJob);
-        };
         try {
           if (cronExpression) {
             await this.pgBossService.registerCronJob(
               jobName,
               cronExpression,
-              boundHandler,
+              methodRef.bind(instance),
               {},
               cronOptions,
             );
             this.logger.log(`Registered cron job: ${jobName}`);
-          } else {
-            await this.pgBossService.registerJob(
-              jobName,
-              boundHandler,
-              jobOptions,
-            );
-            this.logger.log(`Registered job: ${jobName}`);
+            continue;
           }
+
+          await this.pgBossService.registerJob(
+            jobName,
+            methodRef.bind(instance),
+            jobOptions,
+          );
+          this.logger.log(`Registered job: ${jobName}`);
         } catch (error) {
-          this.logger.error(`Error registering job ${jobName}:`, error);
+          this.logger.error(error, `Error registering job ${jobName}`);
         }
       }
     }

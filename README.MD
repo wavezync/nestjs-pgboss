@@ -78,8 +78,8 @@ export class MyJobHandler {
   private readonly logger = new Logger(MyJobHandler.name);
 
   @Job('my-job')
-  async handleMyJob(job: { data: any }) {
-    this.logger.log('Handling job with data:', job.data);
+  async handleMyJob(jobs: any[]) {
+    this.logger.log(`Handling ${jobs.length} job(s)`);
   }
 }
 
