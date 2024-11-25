@@ -79,7 +79,7 @@ export class HandlerScannerService {
           );
           this.logger.log(`Registered job: ${jobName}`);
         } catch (error) {
-          this.logger.error(error, `Error registering job ${jobName}:`);
+          this.logger.error(error, `Error registering job ${jobName}`);
         }
       }
     }
