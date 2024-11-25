@@ -72,14 +72,20 @@ You can access the `PgBoss` instance directly via `pgBossService.boss`
 ```ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Job } from '@wavezync/nestjs-pgboss';
+import { JobWithMetadata } from 'pg-boss';
+
+interface MyJobData {
+  id: number;
+  name: string;
+}
 
 @Injectable()
 export class MyJobHandler {
   private readonly logger = new Logger(MyJobHandler.name);
 
   @Job('my-job')
-  async handleMyJob(jobs: any[]) {
-    this.logger.log(`Handling ${jobs.length} job(s)`);
+  async handleMyJob(jobs: JobWithMetadata<MyJobData>[]) {
+    this.logger.log(`Processing ${jobs.length} job(s)`);
   }
 }
 
