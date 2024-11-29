@@ -9,7 +9,7 @@ import {
   Inject,
 } from "@nestjs/common";
 import { MetadataScanner } from "@nestjs/core";
-import PgBoss from "pg-boss";
+import PgBoss, { ConstructorOptions } from "pg-boss";
 import { defer, lastValueFrom } from "rxjs";
 import { PgBossService } from "./pgboss.service";
 import { LOGGER, PGBOSS_OPTIONS, PGBOSS_TOKEN } from "./utils/consts";
@@ -18,7 +18,7 @@ import {
   PgBossOptionsFactory,
 } from "./interfaces/pgboss-module-options.interface";
 import { HandlerScannerService } from "./handler-scanner.service";
-import { handleRetry } from "utils/handleRetry";
+import { handleRetry } from "./utils/handleRetry";
 
 @Global()
 @Module({
@@ -43,18 +43,10 @@ export class PgBossModule
 
     const pgBossProvider = {
       provide: PGBOSS_TOKEN,
-      useFactory: async (pgBossOptions) => {
+      useFactory: async (pgBossOptions: ConstructorOptions) => {
         const boss = await lastValueFrom(
-          defer(() =>
-            new PgBoss({
-              connectionString: pgBossOptions.connectionString,
-            }).start(),
-          ).pipe(
-            handleRetry(
-              pgBossOptions.retryAttempts,
-              pgBossOptions.retryDelay,
-              pgBossOptions.verboseRetryLog,
-            ),
+          defer(() => new PgBoss(pgBossOptions).start()).pipe(
+            handleRetry(pgBossOptions.retryLimit, pgBossOptions.retryDelay),
           ),
         );
         boss.on("error", (error: Error) => {
