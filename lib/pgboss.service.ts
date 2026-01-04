@@ -1,5 +1,11 @@
 import { Injectable } from "@nestjs/common";
-import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
+import {
+  WorkWithMetadataHandler,
+  PgBoss,
+  SendOptions,
+  ScheduleOptions,
+  WorkOptions,
+} from "pg-boss";
 import { Inject } from "@nestjs/common";
 import { PGBOSS_TOKEN } from "./utils/consts";
 import { transformOptions } from "./utils/helpers";
@@ -19,7 +25,7 @@ export class PgBossService {
   async scheduleJob<TData extends object>(
     name: string,
     data: TData,
-    options?: PgBoss.SendOptions,
+    options?: SendOptions,
   ) {
     await this.pgBoss.createQueue(name);
     await this.pgBoss.send(name, data, options);
@@ -29,7 +35,7 @@ export class PgBossService {
     name: string,
     cron: string,
     data?: TData,
-    options?: PgBoss.ScheduleOptions,
+    options?: ScheduleOptions,
   ) {
     await this.pgBoss.createQueue(name);
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
@@ -40,7 +46,7 @@ export class PgBossService {
     cron: string,
     handler: WorkWithMetadataHandler<TData>,
     data?: TData,
-    options?: PgBoss.ScheduleOptions,
+    options?: ScheduleOptions,
   ) {
     await this.pgBoss.createQueue(name);
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
@@ -54,7 +60,7 @@ export class PgBossService {
   async registerJob<TData extends object>(
     name: string,
     handler: WorkWithMetadataHandler<TData>,
-    options?: PgBoss.WorkOptions,
+    options?: WorkOptions,
   ) {
     await this.pgBoss.createQueue(name);
     await this.pgBoss.work<TData>(

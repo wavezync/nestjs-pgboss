@@ -1,21 +1,32 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import PgBoss from "pg-boss";
+import { PgBoss } from "pg-boss";
 import { PgBossService } from "../lib/pgboss.service";
 import { PGBOSS_TOKEN } from "../lib/utils/consts";
 
-describe("PgBossService", () => {
-  let service: PgBossService;
-  let mockPgBoss: jest.Mocked<PgBoss>;
-
-  beforeEach(async () => {
-    mockPgBoss = {
+jest.mock("pg-boss", () => {
+  return {
+    PgBoss: jest.fn().mockImplementation(() => ({
+      on: jest.fn(),
       start: jest.fn(),
-      work: jest.fn(),
+      stop: jest.fn(),
       send: jest.fn(),
       schedule: jest.fn(),
+      work: jest.fn(),
       createQueue: jest.fn(),
-      getQueue: jest.fn(),
-    } as any;
+    })),
+  };
+});
+
+describe("PgBossService", () => {
+  let service: PgBossService;
+  let mockPgBoss: any;
+
+  beforeEach(async () => {
+    mockPgBoss = new PgBoss("connectionString");
+    mockPgBoss.createQueue.mockResolvedValue(undefined);
+    mockPgBoss.send.mockResolvedValue("job-id");
+    mockPgBoss.schedule.mockResolvedValue(undefined);
+    mockPgBoss.work.mockResolvedValue("worker-id");
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [

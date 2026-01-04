@@ -1,8 +1,8 @@
-import { JobOptions } from "pg-boss";
+import { WorkOptions, ScheduleOptions } from "pg-boss";
 
 export interface HandlerMetadata {
   jobName: string;
-  workOptions?: JobOptions;
+  workOptions?: WorkOptions;
   cronExpression?: string;
-  cronOptions?: JobOptions;
+  cronOptions?: ScheduleOptions;
 }
