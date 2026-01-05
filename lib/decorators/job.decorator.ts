@@ -1,5 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { JobOptions, WorkOptions } from "pg-boss";
+import { ScheduleOptions, WorkOptions } from "pg-boss";
 
 export const JOB_NAME = "JOB_NAME";
 export const JOB_OPTIONS = "JOB_OPTIONS";
@@ -27,7 +27,7 @@ export function Job<_TData extends object = any>(
 export function CronJob<_TData extends object = any>(
   name: string,
   cron: string,
-  options: JobOptions = {},
+  options: ScheduleOptions = {},
 ) {
   return (target: any, key: string, descriptor: PropertyDescriptor) => {
     SetMetadata(JOB_NAME, name)(target, key, descriptor);

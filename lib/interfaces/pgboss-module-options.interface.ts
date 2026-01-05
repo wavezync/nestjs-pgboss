@@ -1,7 +1,10 @@
 import { ModuleMetadata, Type } from "@nestjs/common";
 import { ConstructorOptions } from "pg-boss";
 
-export type PgBossModuleOptions = ConstructorOptions;
+export interface PgBossModuleOptions extends ConstructorOptions {
+  retryLimit?: number;
+  retryDelay?: number;
+}
 
 export interface PgBossOptionsFactory {
   createPgBossOptions(): Promise<PgBossModuleOptions> | PgBossModuleOptions;

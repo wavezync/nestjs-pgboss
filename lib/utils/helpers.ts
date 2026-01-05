@@ -1,14 +1,12 @@
-import PgBoss from "pg-boss";
+import { WorkOptions, ScheduleOptions } from "pg-boss";
 
-export function transformOptions(
-  options?: PgBoss.WorkOptions | PgBoss.ScheduleOptions,
-) {
+export function transformOptions(options?: WorkOptions | ScheduleOptions) {
   if (!options) return {};
 
   const transformedOptions: any = { ...options };
 
-  if (typeof options.priority === "number") {
-    transformedOptions.priority = options.priority > 0;
+  if (typeof (options as any).priority === "number") {
+    transformedOptions.priority = (options as any).priority > 0;
   }
 
   return transformedOptions;
