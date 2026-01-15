@@ -10,6 +10,7 @@ import {
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
 import PgBoss from "pg-boss";
 import { LOGGER } from "./utils/consts";
+import { WorkOptions } from "./interfaces/handler-metadata.interface";
 
 @Injectable()
 export class HandlerScannerService {
@@ -45,7 +46,7 @@ export class HandlerScannerService {
       const methodRef = instance[methodName];
 
       const jobName = this.reflector.get<string>(JOB_NAME, methodRef);
-      const jobOptions = this.reflector.get<PgBoss.WorkOptions>(
+      const jobOptions = this.reflector.get<WorkOptions>(
         JOB_OPTIONS,
         methodRef,
       );
@@ -72,12 +73,15 @@ export class HandlerScannerService {
             continue;
           }
 
-          await this.pgBossService.registerJob(
-            jobName,
-            methodRef.bind(instance),
-            jobOptions,
-          );
-          this.logger.log(`Registered job: ${jobName}`);
+          const teamSize = Math.max(1, jobOptions?.teamSize ?? 1);
+          for (let i = 0; i < teamSize; i++) {
+            await this.pgBossService.registerJob(
+              jobName,
+              methodRef.bind(instance),
+              jobOptions,
+            );
+          }
+          this.logger.log(`Registered job: ${jobName} (${teamSize} worker${teamSize > 1 ? 's' : ''})`);
         } catch (error) {
           this.logger.error(error, `Error registering job ${jobName}`);
         }
