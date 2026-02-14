@@ -23,7 +23,7 @@
   "peerDependencies": {
     "@nestjs/common": "^11",
     "@nestjs/core": "^11",
-    "pg-boss": "^12.6.0",
+    "pg-boss": ">=12.6.0",
     "reflect-metadata": "^0.1.13 || ^0.2.0",
     "rxjs": "^7.2.0"
   },
