@@ -1,6 +1,5 @@
 import { SetMetadata } from "@nestjs/common";
-import { ScheduleOptions } from "pg-boss";
-import { WorkOptions } from "../interfaces/handler-metadata.interface";
+import { ScheduleOptions, WorkOptions } from "pg-boss";
 
 export const JOB_NAME = "JOB_NAME";
 export const JOB_OPTIONS = "JOB_OPTIONS";
