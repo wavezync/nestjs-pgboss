@@ -1,9 +1,9 @@
 {
   "name": "@wavezync/nestjs-pgboss",
-  "version": "5.1.1",
+  "version": "5.2.0",
   "description": "A NestJS module that integrates pg-boss for job scheduling and handling.",
   "license": "MIT",
-  "author": "samaratungajs@wavezync.com",
+  "author": "dev@wavezync.com",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
