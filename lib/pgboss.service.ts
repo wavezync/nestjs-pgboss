@@ -52,7 +52,9 @@ export class PgBossService {
     await this.pgBoss.schedule(name, cron, data ?? {}, options ?? {});
     await this.pgBoss.work<TData>(
       name,
-      { ...transformOptions(options), includeMetadata: true },
+      { ...transformOptions(options), includeMetadata: true } as WorkOptions & {
+        includeMetadata: true;
+      },
       handler,
     );
   }

@@ -8,7 +8,7 @@ import {
   CRON_OPTIONS,
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
-import PgBoss from "pg-boss";
+import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
 import { LOGGER } from "./utils/consts";
 import { WorkOptions } from "pg-boss";
 
@@ -32,11 +32,15 @@ export class HandlerScannerService {
     }
   }
 
-  private async scanProvider(provider: InstanceWrapper<any>) {
-    const { instance } = provider;
+  private async scanProvider(provider: InstanceWrapper) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+    const instance = provider.instance as Record<string, Function> | null;
     if (!instance || typeof instance !== "object") return;
 
-    const prototype = Object.getPrototypeOf(instance);
+    const prototype = Object.getPrototypeOf(instance) as Record<
+      string,
+      unknown
+    >;
     const methodNames = Object.getOwnPropertyNames(prototype).filter(
       (method) =>
         method !== "constructor" && typeof instance[method] === "function",
@@ -65,7 +69,7 @@ export class HandlerScannerService {
             await this.pgBossService.registerCronJob(
               jobName,
               cronExpression,
-              methodRef.bind(instance),
+              methodRef.bind(instance) as WorkWithMetadataHandler<object>,
               {},
               cronOptions,
             );
@@ -75,7 +79,7 @@ export class HandlerScannerService {
 
           await this.pgBossService.registerJob(
             jobName,
-            methodRef.bind(instance),
+            methodRef.bind(instance) as WorkWithMetadataHandler<object>,
             jobOptions,
           );
 

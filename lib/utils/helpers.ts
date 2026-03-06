@@ -1,20 +1,23 @@
 import { WorkOptions, ScheduleOptions } from "pg-boss";
 
-export function transformOptions(options?: WorkOptions | ScheduleOptions) {
+export function transformOptions(
+  options?: WorkOptions | ScheduleOptions,
+): Record<string, unknown> {
   if (!options) return {};
 
-  const transformedOptions: any = { ...options };
+  const transformedOptions: Record<string, unknown> = { ...options };
+  const opts = options as Record<string, unknown>;
 
-  if (typeof (options as any).priority === "number") {
-    transformedOptions.priority = (options as any).priority > 0;
+  if (typeof opts.priority === "number") {
+    transformedOptions.priority = opts.priority > 0;
   }
 
   return transformedOptions;
 }
 
-export function normalizeJob(job: any) {
-  if (typeof job === "object" && "0" in job) {
-    return job[0];
+export function normalizeJob(job: unknown): unknown {
+  if (typeof job === "object" && job !== null && "0" in job) {
+    return (job as Record<string, unknown>)["0"];
   }
   return job;
 }
