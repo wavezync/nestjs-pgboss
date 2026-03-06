@@ -2,7 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [6.0.0] - 2026-03-06
+
+### Bug Fixes
+
+- Avoid accessing prototype getters during handler scanning ([d3e03ac](https://github.com/wavezync/nestjs-pgboss/commit/d3e03ac05e91d3375e7601d3c00b0405ff034fa1))
+- Update node version ([a636684](https://github.com/wavezync/nestjs-pgboss/commit/a63668426ad829dc7bac9a926cc810b83f3f4078))
 
 ### Features
 
@@ -11,6 +16,11 @@ All notable changes to this project will be documented in this file.
 ### Miscellaneous Tasks
 
 - Bump version to 5.2.0 ([acb1cee](https://github.com/wavezync/nestjs-pgboss/commit/acb1ceefed3206ac57d9cf407e74401d17d42bd0))
+- Bump version to 6.0.0 ([70896b5](https://github.com/wavezync/nestjs-pgboss/commit/70896b5913465dd91d7975dcbfceaf6cf92892a0))
+
+### Testing
+
+- Add comprehensive unit tests for all components ([1afe15f](https://github.com/wavezync/nestjs-pgboss/commit/1afe15f504dc99d2a811ef162efa0adaacd7d7f7))
 ## [5.1.1] - 2026-01-31
 
 ### Miscellaneous Tasks
@@ -121,10 +131,6 @@ All notable changes to this project will be documented in this file.
 - Register jobs with handler scanner ([105ae6a](https://github.com/wavezync/nestjs-pgboss/commit/105ae6a0a7f687179bf3e019ab28d3cbf2d836b7))
 - Cleanup code ([ef3b53b](https://github.com/wavezync/nestjs-pgboss/commit/ef3b53b397ad062f1f88a04bc250b088e51605c1))
 - Update readme ([8aeb18d](https://github.com/wavezync/nestjs-pgboss/commit/8aeb18da0349b3ff97af34b3bce476744c011f1e))
-
-### Documentation
-
-- Update readme ([38533a2](https://github.com/wavezync/nestjs-pgboss/commit/38533a2fecf8aea933c7499bdd51a3200e06ee68))
 ## [1.0.0] - 2024-08-12
 
 ### Bug Fixes
@@ -136,6 +142,10 @@ All notable changes to this project will be documented in this file.
 - Update readme ([317a55a](https://github.com/wavezync/nestjs-pgboss/commit/317a55a0c89786a062469e031849b3d42346edf7))
 - Dependencies updated ([15d403b](https://github.com/wavezync/nestjs-pgboss/commit/15d403b41fb5c34375211cf8a16203821e3963ba))
 - CronJob decorator updated ([b653e46](https://github.com/wavezync/nestjs-pgboss/commit/b653e46216da2914bfc97463d04ec98af495b59c))
+
+### Documentation
+
+- Update readme ([38533a2](https://github.com/wavezync/nestjs-pgboss/commit/38533a2fecf8aea933c7499bdd51a3200e06ee68))
 
 ### Miscellaneous Tasks
 
