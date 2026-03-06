@@ -251,4 +251,33 @@ describe("HandlerScannerService", () => {
     const boundHandler = pgBossService.registerJob.mock.calls[0][1];
     expect(typeof boundHandler).toBe("function");
   });
+
+  it("should skip prototype getters that throw (e.g. TypeORM DataSource.mongoManager)", async () => {
+    const proto = Object.create(null);
+    Object.defineProperty(proto, "constructor", { value: class {} });
+    Object.defineProperty(proto, "mongoManager", {
+      get() {
+        throw new Error(
+          "MongoEntityManager is only available for MongoDB databases.",
+        );
+      },
+      enumerable: true,
+    });
+    Object.defineProperty(proto, "handle", {
+      value: jest.fn(),
+      enumerable: true,
+    });
+
+    const instance = Object.create(proto);
+
+    jest.spyOn(reflector, "get").mockReturnValue(undefined);
+
+    const fakeModule = {
+      providers: new Map([["TestProvider", { instance, metatype: class {} }]]),
+    };
+    (modulesContainer as Map<string, any>).set("TestModule", fakeModule);
+
+    // Should not throw despite the getter
+    await expect(scanner.scanAndRegisterHandlers()).resolves.not.toThrow();
+  });
 });

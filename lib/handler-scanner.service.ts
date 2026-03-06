@@ -42,8 +42,11 @@ export class HandlerScannerService {
       unknown
     >;
     const methodNames = Object.getOwnPropertyNames(prototype).filter(
-      (method) =>
-        method !== "constructor" && typeof instance[method] === "function",
+      (method) => {
+        if (method === "constructor") return false;
+        const descriptor = Object.getOwnPropertyDescriptor(prototype, method);
+        return descriptor && typeof descriptor.value === "function";
+      },
     );
 
     for (const methodName of methodNames) {
