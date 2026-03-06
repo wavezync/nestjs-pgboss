@@ -16,10 +16,28 @@
     </a>
 </p>
 
+## Features
+
+- **Decorator-based job handling** — Use `@Job()` and `@CronJob()` decorators to define workers directly on your service methods
+- **Cron scheduling** — Schedule recurring jobs with cron expressions and timezone support
+- **Automatic queue creation** — Queues are created automatically before any job operation
+- **Parallel processing** — Configure `teamSize` and `teamConcurrency` for parallel job workers
+- **Connection retry logic** — Built-in retry with configurable `retryLimit` and `retryDelay` for resilient startup
+- **Graceful shutdown** — PgBoss is automatically stopped when the NestJS application shuts down
+- **Full pg-boss access** — Access the underlying PgBoss instance directly for advanced use cases
+
 ## Installation
 
 ```bash
 npm install pg-boss @wavezync/nestjs-pgboss
+```
+
+```bash
+yarn add pg-boss @wavezync/nestjs-pgboss
+```
+
+```bash
+pnpm add pg-boss @wavezync/nestjs-pgboss
 ```
 
 ## Usage
