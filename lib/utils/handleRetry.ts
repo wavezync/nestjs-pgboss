@@ -4,24 +4,26 @@ import { mergeMap, retryWhen, delay } from "rxjs/operators";
 export function handleRetry(
   retryAttempts = 9,
   retryDelay = 3000,
-  toRetry: (err: any) => boolean = (_err: any) => true,
+  toRetry: (err: unknown) => boolean = () => true,
 ) {
   return <T>(source: import("rxjs").Observable<T>) =>
     source.pipe(
       retryWhen((attempts) =>
         attempts.pipe(
-          mergeMap((error, index) => {
+          mergeMap((error: unknown, index: number) => {
             const includeError = toRetry(error);
 
             if (includeError) {
               if (index + 1 >= retryAttempts) {
-                return throwError(() => new Error(error.message));
+                const message =
+                  error instanceof Error ? error.message : "Unknown error";
+                return throwError(() => new Error(message));
               }
 
               return of(error).pipe(delay(retryDelay));
             }
 
-            return throwError(() => error);
+            return throwError(() => error as Error);
           }),
         ),
       ),
