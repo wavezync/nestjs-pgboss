@@ -2,21 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
-## [6.0.0] - 2026-03-06
+## [7.0.2] - 2026-09-07
+
+### Bump
+
+- Update package json version to 7.0.2 ([4bc5110](https://github.com/wavezync/nestjs-pgboss/commit/4bc5110fa07305901cde79e871c9f81d38f349d6))
+## [7.0.1] - 2026-09-07
 
 ### Bug Fixes
 
 - Avoid accessing prototype getters during handler scanning ([d3e03ac](https://github.com/wavezync/nestjs-pgboss/commit/d3e03ac05e91d3375e7601d3c00b0405ff034fa1))
-- Update node version ([a636684](https://github.com/wavezync/nestjs-pgboss/commit/a63668426ad829dc7bac9a926cc810b83f3f4078))
+- Update node version ([ecb7e91](https://github.com/wavezync/nestjs-pgboss/commit/ecb7e91b3e93999bcd0f17770186e1e2519f8fd9))
+- Remove work metadata genaric passing ([dd39b99](https://github.com/wavezync/nestjs-pgboss/commit/dd39b99e03f786a97e44ce8d2e4df3345978f67a))
+- Add smaller example project ([cf3f542](https://github.com/wavezync/nestjs-pgboss/commit/cf3f54282a09b7a5e1de0701043bcb2388705a2b))
+- Release action version change ([0922c49](https://github.com/wavezync/nestjs-pgboss/commit/0922c49e16332267e0badd782f0fba31496b6b52))
+
+### Documentation
+
+- Add features overview section to README [skip ci] ([34a142c](https://github.com/wavezync/nestjs-pgboss/commit/34a142c7d047ddd24b23d0a59d2104d13ff22623))
 
 ### Features
 
 - Use pg-boss native WorkOptions instead of internal wrapper ([28671a3](https://github.com/wavezync/nestjs-pgboss/commit/28671a37cd77cca56d04e326b07d006f953f54d4))
+- Add queue-options to job ([2dd7c98](https://github.com/wavezync/nestjs-pgboss/commit/2dd7c9821470d6e23cd710fc2a7a49674d52026a))
+- Add example project ([cc58e82](https://github.com/wavezync/nestjs-pgboss/commit/cc58e8287eb723fe247f0828e6356c3b0b23186b))
+- Update example readme ([82a85e7](https://github.com/wavezync/nestjs-pgboss/commit/82a85e7ae8ead67d0276594dce928d9d4b4357ee))
+- Update release action versions ([0dec339](https://github.com/wavezync/nestjs-pgboss/commit/0dec3392067e7a85bf77ab6592fbe2990a9324d3))
 
 ### Miscellaneous Tasks
 
 - Bump version to 5.2.0 ([acb1cee](https://github.com/wavezync/nestjs-pgboss/commit/acb1ceefed3206ac57d9cf407e74401d17d42bd0))
 - Bump version to 6.0.0 ([70896b5](https://github.com/wavezync/nestjs-pgboss/commit/70896b5913465dd91d7975dcbfceaf6cf92892a0))
+- Fix lint issue ([8f07dd5](https://github.com/wavezync/nestjs-pgboss/commit/8f07dd5c98fc3f3c16b8311c8859ba54394e145f))
 
 ### Testing
 
