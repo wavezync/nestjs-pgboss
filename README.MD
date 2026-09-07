@@ -28,6 +28,8 @@
 
 ## Installation
 
+Version 7 requires NestJS 12 and Node.js 22.12+.
+
 ```bash
 npm install pg-boss @wavezync/nestjs-pgboss
 ```
@@ -126,6 +128,26 @@ export class MyCronJobService {
 }
 
 ```
+
+#### Configure retries and other queue options
+
+Retry policy is a queue-level setting in pg-boss, so it goes in the optional
+`queueOptions` argument (applied via `createQueue`). Queue-level settings are
+inherited by every job in the queue unless overridden when the job is sent:
+
+```ts
+@Job('my-job', { batchSize: 5 }, { retryLimit: 5, retryDelay: 30 })
+async handleMyJob(jobs: JobWithMetadata<MyJobData>[]) { ... }
+
+@CronJob('my-cron-job', '0 * * * *', { retryLimit: 3 })
+async handleCron() { ... }
+```
+
+Supported queue options include `retryLimit` (default 2), `retryDelay`,
+`retryBackoff`, `expireInSeconds`, `retentionSeconds`, `deleteAfterSeconds`
+and `deadLetter`. Options passed at send time (`scheduleJob`,
+`scheduleCronJob`, or the `@CronJob` schedule options, which already include
+all queue options) take precedence over these queue defaults.
 
 ## Test
 

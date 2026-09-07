@@ -11,8 +11,8 @@
     "target": "es2017",
     "sourceMap": true,
     "outDir": "./dist",
-    "baseUrl": "lib",
     "incremental": false,
+    "isolatedModules": true,
     "skipLibCheck": true,
     "strictNullChecks": false,
     "noImplicitAny": false,
@@ -20,17 +20,19 @@
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "types": [
-      "@types/node",
-      "jest"
+      "node",
+      "vitest/globals"
     ],
     "strict": true
   },
   "include": [
     "lib/**/*.ts",
-    "test/**/*.ts"
+    "test/**/*.ts",
+    "vitest.config*.mts"
   ],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "example"
   ]
 }

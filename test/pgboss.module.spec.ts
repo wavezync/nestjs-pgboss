@@ -1,10 +1,16 @@
-jest.mock("pg-boss", () => {
+import type { Mock, Mocked } from "vitest";
+import type { DynamicModule } from "@nestjs/common";
+import type { PgBoss } from "pg-boss";
+
+vi.mock("pg-boss", () => {
   return {
-    PgBoss: jest.fn().mockImplementation(() => ({
-      on: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-    })),
+    PgBoss: vi.fn().mockImplementation(function PgBossMock() {
+      return {
+        on: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+      };
+    }),
   };
 });
 
@@ -14,22 +20,27 @@ import { PgBossService } from "../lib/pgboss.service";
 import { PGBOSS_OPTIONS, PGBOSS_TOKEN } from "../lib/utils/consts";
 import { MetadataScanner } from "@nestjs/core";
 
+type MockBoss = { on: Mock; stop: Mock };
+
 describe("PgBossModule", () => {
-  let mockBoss: any;
-  let mockHandlerScanner: jest.Mocked<
+  let mockBoss: MockBoss;
+  let mockHandlerScanner: Mocked<
     Pick<HandlerScannerService, "scanAndRegisterHandlers">
   >;
   let module: PgBossModule;
 
   beforeEach(() => {
     mockBoss = {
-      on: jest.fn(),
-      stop: jest.fn().mockResolvedValue(undefined),
+      on: vi.fn(),
+      stop: vi.fn().mockResolvedValue(undefined),
     };
     mockHandlerScanner = {
-      scanAndRegisterHandlers: jest.fn().mockResolvedValue(undefined),
+      scanAndRegisterHandlers: vi.fn().mockResolvedValue(undefined),
     };
-    module = new PgBossModule(mockBoss, mockHandlerScanner as any);
+    module = new PgBossModule(
+      mockBoss as unknown as PgBoss,
+      mockHandlerScanner as unknown as HandlerScannerService,
+    );
   });
 
   it("should register error event listener on boss in constructor", () => {
@@ -58,7 +69,7 @@ describe("PgBossModule", () => {
 
   describe("forRootAsync", () => {
     it("should return correct module structure with useFactory", () => {
-      const factory = jest.fn();
+      const factory = vi.fn();
       const result = PgBossModule.forRootAsync({
         useFactory: factory,
         inject: ["CONFIG"],
@@ -68,8 +79,8 @@ describe("PgBossModule", () => {
       expect(result.exports).toContain(PgBossService);
       expect(result.exports).toContain(PGBOSS_TOKEN);
 
-      const providerTokens = (result.providers as any[]).map(
-        (p: any) => p.provide || p,
+      const providerTokens = result.providers.map((p) =>
+        "provide" in p ? p.provide : p,
       );
       expect(providerTokens).toContain(PGBOSS_OPTIONS);
       expect(providerTokens).toContain(PGBOSS_TOKEN);
@@ -93,8 +104,8 @@ describe("PgBossModule", () => {
       expect(result.exports).toContain(PgBossService);
       expect(result.exports).toContain(PGBOSS_TOKEN);
 
-      const providerTokens = (result.providers as any[]).map(
-        (p: any) => p.provide || p,
+      const providerTokens = result.providers.map((p) =>
+        "provide" in p ? p.provide : p,
       );
       expect(providerTokens).toContain(PGBOSS_OPTIONS);
       expect(providerTokens).toContain(PGBOSS_TOKEN);
@@ -103,10 +114,10 @@ describe("PgBossModule", () => {
     });
 
     it("should pass imports through", () => {
-      const fakeModule = { module: class FakeModule {} } as any;
+      const fakeModule: DynamicModule = { module: class FakeModule {} };
       const result = PgBossModule.forRootAsync({
         imports: [fakeModule],
-        useFactory: jest.fn(),
+        useFactory: vi.fn(),
       });
 
       expect(result.imports).toContain(fakeModule);
@@ -114,7 +125,7 @@ describe("PgBossModule", () => {
 
     it("should default imports to empty array", () => {
       const result = PgBossModule.forRootAsync({
-        useFactory: jest.fn(),
+        useFactory: vi.fn(),
       });
 
       expect(result.imports).toEqual([]);

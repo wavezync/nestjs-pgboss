@@ -1,3 +1,4 @@
+import type { WorkOptions } from "pg-boss";
 import { transformOptions, normalizeJob } from "../lib/utils/helpers";
 
 describe("transformOptions", () => {
@@ -11,17 +12,13 @@ describe("transformOptions", () => {
   });
 
   it("should convert numeric priority > 0 to true", () => {
-    const options = { priority: 5 } as any;
+    const options = { priority: 5 } as unknown as WorkOptions;
     expect(transformOptions(options)).toEqual({ priority: true });
   });
 
   it("should convert numeric priority <= 0 to false", () => {
-    expect(transformOptions({ priority: 0 } as any)).toEqual({
-      priority: false,
-    });
-    expect(transformOptions({ priority: -1 } as any)).toEqual({
-      priority: false,
-    });
+    expect(transformOptions({ priority: 0 })).toEqual({ priority: false });
+    expect(transformOptions({ priority: -1 })).toEqual({ priority: false });
   });
 });
 

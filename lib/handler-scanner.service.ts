@@ -4,11 +4,12 @@ import { PgBossService } from "./pgboss.service";
 import {
   JOB_NAME,
   JOB_OPTIONS,
+  QUEUE_OPTIONS,
   CRON_EXPRESSION,
   CRON_OPTIONS,
 } from "./decorators/job.decorator";
 import { InstanceWrapper } from "@nestjs/core/injector/instance-wrapper";
-import PgBoss, { WorkWithMetadataHandler } from "pg-boss";
+import PgBoss, { QueueOptions, WorkWithMetadataHandler } from "pg-boss";
 import { LOGGER } from "./utils/consts";
 import { WorkOptions } from "pg-boss";
 
@@ -65,6 +66,10 @@ export class HandlerScannerService {
         CRON_OPTIONS,
         methodRef,
       );
+      const queueOptions = this.reflector.get<QueueOptions>(
+        QUEUE_OPTIONS,
+        methodRef,
+      );
 
       if (jobName) {
         try {
@@ -84,6 +89,7 @@ export class HandlerScannerService {
             jobName,
             methodRef.bind(instance) as WorkWithMetadataHandler<object>,
             jobOptions,
+            queueOptions,
           );
 
           this.logger.log(`Registered job: ${jobName}`);

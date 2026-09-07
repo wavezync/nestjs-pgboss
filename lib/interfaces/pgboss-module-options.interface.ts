@@ -10,8 +10,10 @@ export interface PgBossOptionsFactory {
   createPgBossOptions(): Promise<PgBossModuleOptions> | PgBossModuleOptions;
 }
 
-export interface PgBossModuleAsyncOptions
-  extends Pick<ModuleMetadata, "imports"> {
+export interface PgBossModuleAsyncOptions extends Pick<
+  ModuleMetadata,
+  "imports"
+> {
   useExisting?: Type<PgBossOptionsFactory>;
   useClass?: Type<PgBossOptionsFactory>;
   useFactory?: (

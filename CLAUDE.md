@@ -9,9 +9,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 - **Build:** `npm run build` (uses `nest build`)
-- **Test:** `npm test` (Jest, tests live in `test/`)
-- **Run single test:** `npx jest --testPathPattern=<pattern>`
-- **Lint:** `npm run lint` (ESLint with auto-fix)
+- **Test:** `npm test` (Vitest, tests live in `test/`)
+- **Run single test:** `npx vitest run <file-pattern>` (e.g. `npx vitest run decorators`)
+- **Lint:** `npm run lint` (ESLint; use `npm run lint:fix` to auto-fix)
 - **Format:** `npm run format` (Prettier)
 
 ## Architecture
@@ -36,4 +36,4 @@ Source code is in `lib/` (not `src/`), configured via `nest-cli.json` with `sour
 
 ## Peer Dependencies
 
-Requires `@nestjs/common` ^11, `@nestjs/core` ^11, `pg-boss` >=12.6.0.
+Requires `@nestjs/common` ^12, `@nestjs/core` ^12, `pg-boss` >=12.6.0.

@@ -1,14 +1,18 @@
-jest.mock("pg-boss", () => {
+import type { Mocked } from "vitest";
+
+vi.mock("pg-boss", () => {
   return {
-    PgBoss: jest.fn().mockImplementation(() => ({
-      on: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-      send: jest.fn(),
-      schedule: jest.fn(),
-      work: jest.fn(),
-      createQueue: jest.fn(),
-    })),
+    PgBoss: vi.fn().mockImplementation(function PgBossMock() {
+      return {
+        on: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+        send: vi.fn(),
+        schedule: vi.fn(),
+        work: vi.fn(),
+        createQueue: vi.fn(),
+      };
+    }),
   };
 });
 
@@ -19,13 +23,14 @@ import { PgBossService } from "../lib/pgboss.service";
 import {
   JOB_NAME,
   JOB_OPTIONS,
+  QUEUE_OPTIONS,
   CRON_EXPRESSION,
   CRON_OPTIONS,
 } from "../lib/decorators/job.decorator";
 
 describe("HandlerScannerService", () => {
   let scanner: HandlerScannerService;
-  let pgBossService: jest.Mocked<
+  let pgBossService: Mocked<
     Pick<PgBossService, "registerJob" | "registerCronJob">
   >;
   let reflector: Reflector;
@@ -33,8 +38,8 @@ describe("HandlerScannerService", () => {
 
   beforeEach(async () => {
     pgBossService = {
-      registerJob: jest.fn().mockResolvedValue(undefined),
-      registerCronJob: jest.fn().mockResolvedValue(undefined),
+      registerJob: vi.fn().mockResolvedValue(undefined),
+      registerCronJob: vi.fn().mockResolvedValue(undefined),
     };
 
     const module: TestingModule = await Test.createTestingModule({
@@ -56,7 +61,7 @@ describe("HandlerScannerService", () => {
   });
 
   it("should register @Job-decorated methods via registerJob", async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const instance = {
       handle: handler,
     };
@@ -65,10 +70,10 @@ describe("HandlerScannerService", () => {
       Object.create(null, {
         constructor: { value: class {} },
         handle: { value: handler, enumerable: true },
-      }),
+      }) as object,
     );
 
-    const reflectorGetSpy = jest.spyOn(reflector, "get");
+    const reflectorGetSpy = vi.spyOn(reflector, "get");
     reflectorGetSpy.mockImplementation((key: any, target: any) => {
       if (target === handler) {
         if (key === JOB_NAME) return "test-job";
@@ -96,11 +101,12 @@ describe("HandlerScannerService", () => {
       "test-job",
       expect.any(Function),
       { teamSize: 2 },
+      undefined,
     );
   });
 
-  it("should register @CronJob-decorated methods via registerCronJob", async () => {
-    const handler = jest.fn();
+  it("should pass QUEUE_OPTIONS metadata to registerJob", async () => {
+    const handler = vi.fn();
     const instance = {
       handle: handler,
     };
@@ -109,10 +115,56 @@ describe("HandlerScannerService", () => {
       Object.create(null, {
         constructor: { value: class {} },
         handle: { value: handler, enumerable: true },
-      }),
+      }) as object,
     );
 
-    const reflectorGetSpy = jest.spyOn(reflector, "get");
+    const reflectorGetSpy = vi.spyOn(reflector, "get");
+    reflectorGetSpy.mockImplementation((key: any, target: any) => {
+      if (target === handler) {
+        if (key === JOB_NAME) return "queue-job";
+        if (key === JOB_OPTIONS) return {};
+        if (key === QUEUE_OPTIONS) return { retryLimit: 5 };
+      }
+      return undefined;
+    });
+
+    const fakeModule = {
+      providers: new Map([
+        [
+          "TestProvider",
+          {
+            instance,
+            metatype: class {},
+          },
+        ],
+      ]),
+    };
+    (modulesContainer as Map<string, any>).set("TestModule", fakeModule);
+
+    await scanner.scanAndRegisterHandlers();
+
+    expect(pgBossService.registerJob).toHaveBeenCalledWith(
+      "queue-job",
+      expect.any(Function),
+      {},
+      { retryLimit: 5 },
+    );
+  });
+
+  it("should register @CronJob-decorated methods via registerCronJob", async () => {
+    const handler = vi.fn();
+    const instance = {
+      handle: handler,
+    };
+    Object.setPrototypeOf(
+      instance,
+      Object.create(null, {
+        constructor: { value: class {} },
+        handle: { value: handler, enumerable: true },
+      }) as object,
+    );
+
+    const reflectorGetSpy = vi.spyOn(reflector, "get");
     reflectorGetSpy.mockImplementation((key: any, target: any) => {
       if (target === handler) {
         if (key === JOB_NAME) return "cron-job";
@@ -162,17 +214,17 @@ describe("HandlerScannerService", () => {
 
   it("should skip methods without job metadata", async () => {
     const instance = {
-      someMethod: jest.fn(),
+      someMethod: vi.fn(),
     };
     Object.setPrototypeOf(
       instance,
       Object.create(null, {
         constructor: { value: class {} },
-        someMethod: { value: jest.fn(), enumerable: true },
-      }),
+        someMethod: { value: vi.fn(), enumerable: true },
+      }) as object,
     );
 
-    jest.spyOn(reflector, "get").mockReturnValue(undefined);
+    vi.spyOn(reflector, "get").mockReturnValue(undefined);
 
     const fakeModule = {
       providers: new Map([["TestProvider", { instance, metatype: class {} }]]),
@@ -186,7 +238,7 @@ describe("HandlerScannerService", () => {
   });
 
   it("should log errors when registration fails", async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const instance = {
       handle: handler,
     };
@@ -195,10 +247,10 @@ describe("HandlerScannerService", () => {
       Object.create(null, {
         constructor: { value: class {} },
         handle: { value: handler, enumerable: true },
-      }),
+      }) as object,
     );
 
-    jest.spyOn(reflector, "get").mockImplementation((key: any, target: any) => {
+    vi.spyOn(reflector, "get").mockImplementation((key: any, target: any) => {
       if (target === handler) {
         if (key === JOB_NAME) return "failing-job";
         if (key === JOB_OPTIONS) return {};
@@ -220,7 +272,7 @@ describe("HandlerScannerService", () => {
   });
 
   it("should bind handler to the correct instance context", async () => {
-    const handler = jest.fn();
+    const handler = vi.fn();
     const instance = {
       handle: handler,
     };
@@ -229,10 +281,10 @@ describe("HandlerScannerService", () => {
       Object.create(null, {
         constructor: { value: class {} },
         handle: { value: handler, enumerable: true },
-      }),
+      }) as object,
     );
 
-    jest.spyOn(reflector, "get").mockImplementation((key: any, target: any) => {
+    vi.spyOn(reflector, "get").mockImplementation((key: any, target: any) => {
       if (target === handler) {
         if (key === JOB_NAME) return "bound-job";
         if (key === JOB_OPTIONS) return {};
@@ -253,7 +305,7 @@ describe("HandlerScannerService", () => {
   });
 
   it("should skip prototype getters that throw (e.g. TypeORM DataSource.mongoManager)", async () => {
-    const proto = Object.create(null);
+    const proto = Object.create(null) as object;
     Object.defineProperty(proto, "constructor", { value: class {} });
     Object.defineProperty(proto, "mongoManager", {
       get() {
@@ -264,13 +316,13 @@ describe("HandlerScannerService", () => {
       enumerable: true,
     });
     Object.defineProperty(proto, "handle", {
-      value: jest.fn(),
+      value: vi.fn(),
       enumerable: true,
     });
 
-    const instance = Object.create(proto);
+    const instance = Object.create(proto) as object;
 
-    jest.spyOn(reflector, "get").mockReturnValue(undefined);
+    vi.spyOn(reflector, "get").mockReturnValue(undefined);
 
     const fakeModule = {
       providers: new Map([["TestProvider", { instance, metatype: class {} }]]),

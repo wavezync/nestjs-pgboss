@@ -1,28 +1,31 @@
 import { Test, TestingModule } from "@nestjs/testing";
 import { PgBoss } from "pg-boss";
+import type { Mocked } from "vitest";
 import { PgBossService } from "../lib/pgboss.service";
 import { PGBOSS_TOKEN } from "../lib/utils/consts";
 
-jest.mock("pg-boss", () => {
+vi.mock("pg-boss", () => {
   return {
-    PgBoss: jest.fn().mockImplementation(() => ({
-      on: jest.fn(),
-      start: jest.fn(),
-      stop: jest.fn(),
-      send: jest.fn(),
-      schedule: jest.fn(),
-      work: jest.fn(),
-      createQueue: jest.fn(),
-    })),
+    PgBoss: vi.fn().mockImplementation(function PgBossMock() {
+      return {
+        on: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+        send: vi.fn(),
+        schedule: vi.fn(),
+        work: vi.fn(),
+        createQueue: vi.fn(),
+      };
+    }),
   };
 });
 
 describe("PgBossService", () => {
   let service: PgBossService;
-  let mockPgBoss: jest.Mocked<PgBoss>;
+  let mockPgBoss: Mocked<PgBoss>;
 
   beforeEach(async () => {
-    mockPgBoss = new PgBoss("connectionString") as jest.Mocked<PgBoss>;
+    mockPgBoss = new PgBoss("connectionString") as Mocked<PgBoss>;
     mockPgBoss.createQueue.mockResolvedValue(undefined);
     mockPgBoss.send.mockResolvedValue("job-id");
     mockPgBoss.schedule.mockResolvedValue(undefined);
@@ -44,7 +47,7 @@ describe("PgBossService", () => {
 
   describe("registerJob", () => {
     it("should call PgBoss work with correct parameters", async () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const options = {};
 
       await service.registerJob("test-job", handler, options);
@@ -54,6 +57,19 @@ describe("PgBossService", () => {
         "test-job",
         { includeMetadata: true },
         handler,
+      );
+    });
+
+    it("should pass queue options to createQueue", async () => {
+      const handler = vi.fn();
+      const queueOptions = { retryLimit: 5, retryDelay: 30 };
+
+      await service.registerJob("test-job", handler, {}, queueOptions);
+
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      expect(mockPgBoss.createQueue).toHaveBeenCalledWith(
+        "test-job",
+        queueOptions,
       );
     });
   });
@@ -126,7 +142,7 @@ describe("PgBossService", () => {
 
   describe("registerCronJob", () => {
     it("should call PgBoss schedule and work with correct parameters", async () => {
-      const handler = jest.fn();
+      const handler = vi.fn();
       const cron = "* * * * *";
       const data = { test: "data" };
       const options = { tz: "UTC" };
