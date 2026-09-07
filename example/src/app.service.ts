@@ -1,8 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, OnApplicationBootstrap } from '@nestjs/common';
+import { PgBossService } from '@wavezync/nestjs-pgboss';
 
 @Injectable()
-export class AppService {
-  getHello(): string {
-    return 'Hello World!';
+export class AppService implements OnApplicationBootstrap {
+  constructor(private readonly boss: PgBossService) {}
+
+  async onApplicationBootstrap(): Promise<void> {
+    await this.boss.scheduleJob('say-hello', { name: 'world' });
   }
 }
