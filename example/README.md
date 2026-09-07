@@ -1,6 +1,4 @@
-# Dead-simple @wavezync/nestjs-pgboss example
-
-Shows only the essentials: module setup, `@Job`, `@CronJob`, and `scheduleJob`.
+# @wavezync/nestjs-pgboss example
 
 - `src/app.module.ts` — `PgBossModule.forRootAsync` with a `DATABASE_URL` connection string.
 - `src/hello.processor.ts` — `@Job('say-hello')` handler plus `@CronJob('tick', '* * * * *')` that enqueues a `say-hello` job every minute.
